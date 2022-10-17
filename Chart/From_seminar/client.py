@@ -8,9 +8,6 @@ def receive():
     while is_run:
         try:
             message = client.recv(1024).decode('UTF-8')
-            if message == 'EXIT':
-                is_run = False
-                continue
             if message == 'NICK':
                 client.send(nickname.encode('UTF-8'))
             else:
@@ -25,12 +22,19 @@ def receive():
 def write():
     global is_run
     while is_run:
-        message = '{}: {}'.format(nickname, input(''))
-        client.send(message.encode('UTF-8'))
+        userinput = input('')
+        if userinput == 'Disconnect':
+            message = f'{nickname}: {userinput}'
+            client.send(message.encode('ASCII'))
+            is_run = False
+            client.close()
+            continue
+        message = f'{nickname}: {userinput}'
+        client.send(message.encode('ASCII'))
 
 
 nickname = input('Choose your nickname: ')
-server_add = ('localhost', 9669)
+server_add = ('192.168.100.23', 9669)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     client.connect(server_add)

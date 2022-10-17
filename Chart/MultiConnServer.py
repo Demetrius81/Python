@@ -1,11 +1,10 @@
-import sys
 import socket
 import selectors
 import types
 
 
 def accept_wrapper(sock):
-    conn, addr = sock.accept()  # Should be ready to read
+    conn, addr = sock.accept()
     print(f"Accepted connection from {addr}")
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
@@ -16,8 +15,9 @@ def accept_wrapper(sock):
 def service_connection(key, mask):
     sock = key.fileobj
     data = key.data
+    socks: list
     if mask & selectors.EVENT_READ:
-        recv_data = sock.recv(1024)  # Should be ready to read
+        recv_data = sock.recv(1024)
         if recv_data:
             data.outb += recv_data
         else:
@@ -27,17 +27,16 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_WRITE:
         if data.outb:
             print(f"Echoing {data.outb!r} to {data.addr}")
-            sent = sock.send(data.outb)  # Should be ready to write
+            sent: object = sock.send(key.data.outb)
             data.outb = data.outb[sent:]
 
 
 sel = selectors.DefaultSelector()
-soc = ('localhost', 9669)
-host, port = soc[0], soc[1]
+soc = ('192.168.100.23', 9669)
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-lsock.bind((host, port))
+lsock.bind(soc)
 lsock.listen()
-print(f"Listening on {(host, port)}")
+print(f"Listening on {soc}")
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 try:
