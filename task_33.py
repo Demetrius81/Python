@@ -27,9 +27,10 @@ def polynomial_term(n):
     return f'{a}x^{n}'
 
 
-def writetofile(msg):
-    f = open('test.txt', "a")
+def writetofile(msg, path):
+    f = open(path, "a")
     f.write(msg + '\n')
     f.close()
 
-writetofile(generate_polynomial(8))
+
+writetofile(generate_polynomial(8), 'test1.txt')
